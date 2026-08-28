@@ -3,8 +3,10 @@ package com.attendance;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -127,10 +129,32 @@ public class MainUI extends JFrame {
     }
 
     private void exportData() {
-        JOptionPane.showMessageDialog(this,
-                "Excel Export functionality will be added in Step 22.",
-                "Info",
-                JOptionPane.INFORMATION_MESSAGE);
+        if (tableModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "No data to export.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save as Excel file");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files (*.xlsx)", "xlsx"));
+        fileChooser.setSelectedFile(new File("Attendance_Export.xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+
+            String filePath = fileToSave.getAbsolutePath();
+            if (!filePath.toLowerCase().endsWith(".xlsx")) {
+                fileToSave = new File(filePath + ".xlsx");
+            }
+
+            try {
+                ExcelExporter.exportTable(attendanceTable, fileToSave);
+                JOptionPane.showMessageDialog(this, "Data exported successfully to:\n" + fileToSave.getAbsolutePath(), "Export Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error exporting data: " + ex.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     public DefaultTableModel getTableModel() {
