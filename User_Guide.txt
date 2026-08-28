@@ -1,0 +1,16 @@
+Hikvision Attendance Fetcher - User Guide
+
+
+Step 1: Extract the provided folder containing 'HikvisionAttendance.exe' and 'config.properties' to your Desktop or a preferred location.
+
+Step 2: Ensure both the '.exe' file and the 'config.properties' file ALWAYS remain in the same folder.
+
+Step 3: Right-click the 'config.properties' file, open it with Notepad, and update the device IP, username, and password to match your fingerprint terminal. Save and close.
+
+Step 4: Double-click 'HikvisionAttendance.exe' to launch the application. (Note: Previously fetched records will load automatically even if you are offline).
+
+Step 5: To fetch new data, select your desired 'Start Date' and 'End Date' using the date selectors at the top.
+
+Step 6: Click the "Fetch Attendance" button. The app will securely connect to the terminal and download the logs.
+
+Step 7: To save the data for payroll or HR purposes, click the "Export to Excel" button, choose your save location, and save the .xlsx file.
