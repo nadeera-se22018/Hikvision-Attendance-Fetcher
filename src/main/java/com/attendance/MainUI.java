@@ -1,8 +1,13 @@
 package com.attendance;
 
+import com.toedter.calendar.JDateChooser;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 public class MainUI extends JFrame {
@@ -10,12 +15,15 @@ public class MainUI extends JFrame {
     private JTable attendanceTable;
     private DefaultTableModel tableModel;
     private JButton btnFetch;
+    private JButton btnExport;
+    private JDateChooser startDateChooser;
+    private JDateChooser endDateChooser;
 
     public MainUI() {
         DatabaseManager.initializeDatabase();
 
         setTitle("Hikvision Attendance Fetcher");
-        setSize(700, 500);
+        setSize(850, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -37,10 +45,30 @@ public class MainUI extends JFrame {
         JScrollPane scrollPane = new JScrollPane(attendanceTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        btnFetch = new JButton("Fetch Attendance Data");
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+
+        topPanel.add(new JLabel("Start Date:"));
+        startDateChooser = new JDateChooser();
+        startDateChooser.setDateFormatString("yyyy-MM-dd");
+        startDateChooser.setPreferredSize(new Dimension(130, 25));
+        startDateChooser.setDate(Date.from(LocalDate.now().minusDays(30).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        topPanel.add(startDateChooser);
+
+        topPanel.add(new JLabel("End Date:"));
+        endDateChooser = new JDateChooser();
+        endDateChooser.setDateFormatString("yyyy-MM-dd");
+        endDateChooser.setPreferredSize(new Dimension(130, 25));
+        endDateChooser.setDate(new Date());
+        topPanel.add(endDateChooser);
+
+        btnFetch = new JButton("Fetch Attendance");
         btnFetch.addActionListener(e -> fetchData());
         topPanel.add(btnFetch);
+
+        btnExport = new JButton("Export to Excel");
+        btnExport.addActionListener(e -> exportData());
+        topPanel.add(btnExport);
+
         add(topPanel, BorderLayout.NORTH);
 
         loadLocalData();
@@ -56,7 +84,7 @@ public class MainUI extends JFrame {
 
     private void fetchData() {
         btnFetch.setEnabled(false);
-        btnFetch.setText("Fetching Data...");
+        btnFetch.setText("Fetching...");
 
         SwingWorker<List<AttendanceRecord>, Void> worker = new SwingWorker<>() {
             @Override
@@ -78,15 +106,30 @@ public class MainUI extends JFrame {
                             JOptionPane.ERROR_MESSAGE);
                 } finally {
                     btnFetch.setEnabled(true);
-                    btnFetch.setText("Fetch Attendance Data");
+                    btnFetch.setText("Fetch Attendance");
                 }
             }
         };
         worker.execute();
     }
 
+    private void exportData() {
+        JOptionPane.showMessageDialog(this,
+                "Excel Export functionality will be added in Step 22.",
+                "Info",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
     public DefaultTableModel getTableModel() {
         return tableModel;
+    }
+
+    public JDateChooser getStartDateChooser() {
+        return startDateChooser;
+    }
+
+    public JDateChooser getEndDateChooser() {
+        return endDateChooser;
     }
 
     public static void main(String[] args) {
