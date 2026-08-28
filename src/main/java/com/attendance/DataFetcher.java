@@ -10,12 +10,13 @@ import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class DataFetcher {
 
-    public static String fetchAttendanceJson() throws IOException, ParseException {
+    public static String fetchAttendanceJson(Date startDate, Date endDate) throws IOException, ParseException {
         String ip = ConfigManager.get("device.ip");
         String url = "http://" + ip + "/ISAPI/AccessControl/AcsEvent?format=json";
 
@@ -30,8 +31,11 @@ public class DataFetcher {
             acsEventCond.addProperty("minor", 75);
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
-            String startTime = ZonedDateTime.now().minusDays(30).format(formatter);
-            String endTime = ZonedDateTime.now().format(formatter);
+
+            String startTime = startDate.toInstant().atZone(ZoneId.systemDefault())
+                    .withHour(0).withMinute(0).withSecond(0).format(formatter);
+            String endTime = endDate.toInstant().atZone(ZoneId.systemDefault())
+                    .withHour(23).withMinute(59).withSecond(59).format(formatter);
 
             acsEventCond.addProperty("startTime", startTime);
             acsEventCond.addProperty("endTime", endTime);

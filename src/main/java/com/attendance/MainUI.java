@@ -83,13 +83,26 @@ public class MainUI extends JFrame {
     }
 
     private void fetchData() {
+        Date startDate = startDateChooser.getDate();
+        Date endDate = endDateChooser.getDate();
+
+        if (startDate == null || endDate == null) {
+            JOptionPane.showMessageDialog(this, "Please select both Start Date and End Date.", "Invalid Date", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (startDate.after(endDate)) {
+            JOptionPane.showMessageDialog(this, "Start Date cannot be after End Date.", "Invalid Date Range", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         btnFetch.setEnabled(false);
         btnFetch.setText("Fetching...");
 
         SwingWorker<List<AttendanceRecord>, Void> worker = new SwingWorker<>() {
             @Override
             protected List<AttendanceRecord> doInBackground() throws Exception {
-                String jsonResponse = DataFetcher.fetchAttendanceJson();
+                String jsonResponse = DataFetcher.fetchAttendanceJson(startDate, endDate);
                 return AttendanceParser.parse(jsonResponse);
             }
 
@@ -124,12 +137,8 @@ public class MainUI extends JFrame {
         return tableModel;
     }
 
-    public JDateChooser getStartDateChooser() {
-        return startDateChooser;
-    }
-
-    public JDateChooser getEndDateChooser() {
-        return endDateChooser;
+    public JTable getAttendanceTable() {
+        return attendanceTable;
     }
 
     public static void main(String[] args) {
